@@ -4,7 +4,9 @@ Readme for BGAEditor v1.9 by Cryptomancer
 
 INTRODUCTION:  
 This is a saved game editor for Battlefleet Gothic: Armada. It supports editing solo skirmish profiles and campaign saved games.  
-BGAEditor is a purely Command Line Interface (CLI) application written in Python 3.6.4. You do not need a Python interpreter to run this editor as it is distributed in Windows binary form along with this file and the original source code.  
+BGAEditor is a purely Command Line Interface (CLI) application written in Python 3.6.4.  
+
+BGAEditor is available as a Windows binary. Simply download BGAEditor.exe and you're good to go. No Python interpreter necessary.  
 
 FEATURES SUPPORTED:  
 Edit admiral level, ship slots, escort ship upgrade slots, renown, and elite level.  
