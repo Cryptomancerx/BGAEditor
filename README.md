@@ -67,4 +67,4 @@ Note about Crew Skill values:
 As of the Space Marine patch (1.5.8468), the data structure for ships was changed. Before this patch all crew skills used the names of the Imperial Navy fleet so the same parsing code would work for any faction. With the Space Marine patch, the crew skill names are faction specific. This means I would have to write unique parsing code for each faction and quite frankly that's a pain in the ass that I don't feel is worth it. Users can still set crew points and distribute them as they wish.  
 
 To compile BGAEditor into a Windows binary you will need pyinstaller which can be installed via pip. Use the following command:  
-pyinstaller -F -i BGA.ico BGAMain.py
+pyinstaller -F -i BGA.ico BGAEditor.py
