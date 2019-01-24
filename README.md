@@ -17,11 +17,11 @@ INTERFACE:
 The interface is purely CLI. I don't know how to code a GUI and I have no interest in learning. I will not release a GUI for this editor so don't ask.  
 Input is done through a series of text prompts in the form of:  
 
-number:Explanation  
+Number:Explanation  
 or  
-property:value  
+Property:Value  
 
-To select a given option enter everything to the left of the colon verbatim. This includes capitalization and punctuation. If you see a property enclosed in parenthesis then it is displayed purely FYI and is not editable. For example:  
+To select a given option enter everything to the left of the colon verbatim. This includes capitalization. If you see a property enclosed in parenthesis then it is displayed purely FYI and is not editable. For example:  
 
 (Faction): IMPERIUM -- This is NOT editable  
 Renown: 100 -- This is editable  
@@ -67,4 +67,4 @@ Note about Crew Skill values:
 As of the Space Marine patch (1.5.8468), the data structure for ships was changed. Before this patch all crew skills used the names of the Imperial Navy fleet so the same parsing code would work for any faction. With the Space Marine patch, the crew skill names are faction specific. This means I would have to write unique parsing code for each faction and quite frankly that's a pain in the ass that I don't feel is worth it. Users can still set crew points and distribute them as they wish.  
 
 To compile BGAEditor into a Windows binary you will need pyinstaller which can be installed via pip. Use the following command:  
-pyinstaller -F -i BGA.ico BGAMain.py
+pyinstaller -F -i BGA.ico BGAEditor.py
