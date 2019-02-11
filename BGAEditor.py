@@ -231,28 +231,26 @@ def EditAdmiral(ProfileMM, AdmiralName, isCampaign):
   
 def EditShips(ProfileMM):
   ProfileMM.seek(0) #Reset MM file position in case this function gets called in the middle of execution
+  ships = FindShips(ProfileMM)
   print("Ship List\n")
-  
-  while True: #Find and display list of non Escort class ships
-    ShipPos = ProfileMM.find(b'\x53\x68\x69\x70\x44\x61\x74\x61') #ShipData
-    if (ShipPos == -1):
-      break
-    ProfileMM.seek(ShipPos+58)
-    StrLength = int.from_bytes(ProfileMM.read(4), sys.byteorder)
-    if (StrLength == 0 or StrLength > 255): #Ensure a valid ship name length value
-      continue
-    ShipName = ProfileMM.read(StrLength).decode("utf-8")
-    ProfileMM.seek(ProfileMM.find(b'\x54\x6F\x6E\x6E\x61\x67\x65\x3A\x3A')+9) #Tonnage::
-    if (ProfileMM.read(6) != b'\x45\x53\x43\x4F\x52\x54' and ShipName != ""):  #Exclude Escort ships
-      print(ShipName)
-    
-  print("\nBack: Go Back")
-      
+  print(*ships, sep = "\n")
+  print("MAXALLSHIPS!: Max all ships\n")
+  print("Back: Go Back")
+
   while True: #Ship selection input loop
     ProfileMM.seek(0)
     EditShip = input("\nSelect Ship: "); print("")
-    if (EditShip == "Back"):
+    if (EditShip == "MAXALLSHIPS!"):
+        for ship in ships:
+            ship += "\0"
+            ShipPos = ProfileMM.find(ship.encode("utf-8"))
+            ProfileMM.seek(ShipPos)
+            MaxShip(ProfileMM)
+            print("Maxed:", ship)
+        return
+    elif (EditShip == "Back"):
       return
+
     EditShip += "\0"  #Append a null byte to ensure we don't match against the class of ship
     ShipPos = ProfileMM.find(EditShip.encode("utf-8"))
     if (ShipPos == -1):
@@ -260,7 +258,7 @@ def EditShips(ProfileMM):
       continue
     else:
       break
-  
+
   while True: #Ship property edit input loop. See Readme for explanation of why individual crew skill code is commented out
     ProfileMM.seek(ShipPos+len(EditShip)+57)
     StrLength = int.from_bytes(ProfileMM.read(4), sys.byteorder)
@@ -295,7 +293,7 @@ def EditShips(ProfileMM):
     print("Back: Go Back")
     EditProperty = input("\nSelect Property: "); print("")
     ProfileMM.seek(ShipPos)
-  
+
     if (EditProperty == "Level"):
       ShipLevelNew = int(input("Enter new level: ")); print("")
       EditLevel(ProfileMM,0,ShipLevelNew,0)
@@ -316,21 +314,40 @@ def EditShips(ProfileMM):
       ProfileMM.seek(ProfileMM.find(b'\x42\x61\x74\x74\x6C\x65\x57\x61\x67\x65\x64',ProfileMM.tell())+36) #BattleWaged
       ProfileMM.write(ShipPropertyNew.to_bytes(1,sys.byteorder))
     elif (EditProperty == "MAXSHIP!"):
-      EditLevel(ProfileMM,0,10,0)
-      ShipPropertyNew = 9
-      ProfileMM.seek(ProfileMM.find(b'\x4E\x62\x55\x70\x67\x72\x61\x64\x65\x73\x41\x76\x61\x69\x6C\x61\x62\x6C\x65',ProfileMM.tell())+44)  #NbUpgradesAvailable
-      ProfileMM.write(ShipPropertyNew.to_bytes(1,sys.byteorder))
-      ShipPropertyNew = 5
-      ProfileMM.seek(ProfileMM.find(b'\x53\x6C\x6F\x74\x73\x4D\x61\x78',ProfileMM.tell())+33) #SlotsMax
-      ProfileMM.write(ShipPropertyNew.to_bytes(1,sys.byteorder))
+      MaxShip(ProfileMM)
     elif (EditProperty == "Back"):
       break
     else:
       print("Invalid Selection - Try Again\n")
       continue
-
   ProfileMM.flush()
   return
+
+def FindShips(ProfileMM):
+    ships = []
+    while True: #Find and display list of non Escort class ships
+      ShipPos = ProfileMM.find(b'\x53\x68\x69\x70\x44\x61\x74\x61') #ShipData
+      if (ShipPos == -1):
+        break
+      ProfileMM.seek(ShipPos+58)
+      StrLength = int.from_bytes(ProfileMM.read(4), sys.byteorder)
+      if (StrLength == 0 or StrLength > 255): #Ensure a valid ship name length value
+        continue
+      ShipName = ProfileMM.read(StrLength).decode("utf-8")
+      ProfileMM.seek(ProfileMM.find(b'\x54\x6F\x6E\x6E\x61\x67\x65\x3A\x3A')+9) #Tonnage::
+      if (ProfileMM.read(6) != b'\x45\x53\x43\x4F\x52\x54' and ShipName != ""):  #Exclude Escort ships
+        ships.append(ShipName[:-1])
+    return ships
+
+def MaxShip(ProfileMM):
+    EditLevel(ProfileMM,0,10,0)
+    ShipPropertyNew = 9
+    ProfileMM.seek(ProfileMM.find(b'\x4E\x62\x55\x70\x67\x72\x61\x64\x65\x73\x41\x76\x61\x69\x6C\x61\x62\x6C\x65',ProfileMM.tell())+44)  #NbUpgradesAvailable
+    ProfileMM.write(ShipPropertyNew.to_bytes(1,sys.byteorder))
+    ShipPropertyNew = 5
+    ProfileMM.seek(ProfileMM.find(b'\x53\x6C\x6F\x74\x73\x4D\x61\x78',ProfileMM.tell())+33) #SlotsMax
+    ProfileMM.write(ShipPropertyNew.to_bytes(1,sys.byteorder))
+    return
   
 def EditLevel(ProfileMM,IsAdmiral,Level,IsNextLevel):
   AdmiralXPValues = {1:0, 2:200, 3:500, 4:900, 5:1400, 6:2000, 7:2700, 8:3500}
